@@ -56,6 +56,14 @@ function App() {
     setMobileMenuOpen(false);
   };
 
+  const handleAuthSuccess = (isNewUser?: boolean) => {
+    setShowAuthModal(false);
+    // If it's a new user, automatically navigate to the divination page
+    if (isNewUser) {
+      setCurrentPage('divination');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
@@ -121,7 +129,7 @@ function App() {
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
-          onSuccess={() => setShowAuthModal(false)}
+          onSuccess={handleAuthSuccess}
         />
       </div>
     );

@@ -5,7 +5,7 @@ import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (isNewUser?: boolean) => void;
 }
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
@@ -35,14 +35,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           password,
         });
         if (error) throw error;
+        onSuccess(false); // Existing user
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
         });
         if (error) throw error;
+        onSuccess(true); // New user
       }
-      onSuccess();
       onClose();
     } catch (err: any) {
       // Provide more user-friendly error messages
