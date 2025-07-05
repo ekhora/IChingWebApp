@@ -45,7 +45,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.message);
+      // Provide more user-friendly error messages
+      let errorMessage = err.message;
+      
+      if (err.message === 'Invalid login credentials') {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (err.message.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and confirm your account before signing in.';
+      } else if (err.message.includes('Password should be at least')) {
+        errorMessage = 'Password must be at least 6 characters long.';
+      } else if (err.message.includes('Unable to validate email address')) {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (err.message.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please sign in instead.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
