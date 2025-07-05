@@ -4,9 +4,12 @@ import { User } from '@supabase/supabase-js';
 import AuthModal from './components/AuthModal';
 import DivinationPage from './components/DivinationPage';
 import HistoryPage from './components/HistoryPage';
-import { Sparkles, History, LogOut, Menu, X } from 'lucide-react';
+import PremiumPage from './components/PremiumPage';
+import SuccessPage from './components/SuccessPage';
+import { useSubscription } from './hooks/useSubscription';
+import { Sparkles, History, LogOut, Menu, X, Crown } from 'lucide-react';
 
-type PageType = 'divination' | 'history';
+type PageType = 'divination' | 'history' | 'premium' | 'success';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,6 +17,7 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageType>('divination');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isPremium } = useSubscription(user);
 
   useEffect(() => {
     // Get initial session
@@ -29,6 +33,14 @@ function App() {
         setLoading(false);
       }
     );
+
+    // Check for success page redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('session_id')) {
+      setCurrentPage('success');
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     return () => subscription.unsubscribe();
   }, []);
@@ -126,6 +138,12 @@ function App() {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold text-gray-800">I Ching Oracle</h1>
+              {isPremium && (
+                <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                  <Crown className="w-3 h-3" />
+                  Premium
+                </div>
+              )}
             </div>
 
             {/* Desktop Navigation */}
@@ -151,6 +169,17 @@ function App() {
               >
                 <History className="w-4 h-4" />
                 History
+              </button>
+              <button
+                onClick={() => handlePageChange('premium')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  currentPage === 'premium' 
+                    ? 'bg-yellow-500 text-white' 
+                    : 'text-gray-600 hover:text-yellow-600 hover:bg-yellow-50'
+                }`}
+              >
+                <Crown className="w-4 h-4" />
+                Premium
               </button>
               <button
                 onClick={handleSignOut}
@@ -197,6 +226,17 @@ function App() {
                   History
                 </button>
                 <button
+                  onClick={() => handlePageChange('premium')}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${
+                    currentPage === 'premium' 
+                      ? 'bg-yellow-500 text-white' 
+                      : 'text-gray-600 hover:bg-yellow-50'
+                  }`}
+                >
+                  <Crown className="w-4 h-4" />
+                  Premium
+                </button>
+                <button
                   onClick={handleSignOut}
                   className="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                 >
@@ -213,6 +253,8 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         {currentPage === 'divination' && <DivinationPage user={user} />}
         {currentPage === 'history' && <HistoryPage user={user} />}
+        {currentPage === 'premium' && <PremiumPage user={user} />}
+        {currentPage === 'success' && <SuccessPage user={user} onNavigate={handlePageChange} />}
       </main>
     </div>
   );
