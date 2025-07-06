@@ -3,13 +3,14 @@ import { supabase } from './lib/supabase';
 import { User } from '@supabase/supabase-js';
 import AuthModal from './components/AuthModal';
 import DivinationPage from './components/DivinationPage';
+import PredictPage from './components/PredictPage';
 import HistoryPage from './components/HistoryPage';
 import PremiumPage from './components/PremiumPage';
 import SuccessPage from './components/SuccessPage';
 import { useSubscription } from './hooks/useSubscription';
-import { Sparkles, History, LogOut, Menu, X, Crown } from 'lucide-react';
+import { Sparkles, History, LogOut, Menu, X, Crown, Coins } from 'lucide-react';
 
-type PageType = 'divination' | 'history' | 'premium' | 'success';
+type PageType = 'divination' | 'predict' | 'history' | 'premium' | 'success';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -168,6 +169,17 @@ function App() {
                 Divination
               </button>
               <button
+                onClick={() => handlePageChange('predict')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  currentPage === 'predict' 
+                    ? 'bg-amber-500 text-white' 
+                    : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50'
+                }`}
+              >
+                <Coins className="w-4 h-4" />
+                Coin Oracle
+              </button>
+              <button
                 onClick={() => handlePageChange('history')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                   currentPage === 'history' 
@@ -223,6 +235,17 @@ function App() {
                   Divination
                 </button>
                 <button
+                  onClick={() => handlePageChange('predict')}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${
+                    currentPage === 'predict' 
+                      ? 'bg-amber-500 text-white' 
+                      : 'text-gray-600 hover:bg-amber-50'
+                  }`}
+                >
+                  <Coins className="w-4 h-4" />
+                  Coin Oracle
+                </button>
+                <button
                   onClick={() => handlePageChange('history')}
                   className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${
                     currentPage === 'history' 
@@ -260,6 +283,12 @@ function App() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {currentPage === 'divination' && <DivinationPage user={user} />}
+        {currentPage === 'predict' && (
+          <PredictPage 
+            user={user} 
+            onNavigateToHistory={() => handlePageChange('history')} 
+          />
+        )}
         {currentPage === 'history' && <HistoryPage user={user} />}
         {currentPage === 'premium' && <PremiumPage user={user} />}
         {currentPage === 'success' && <SuccessPage user={user} onNavigate={handlePageChange} />}
